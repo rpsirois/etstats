@@ -1,49 +1,59 @@
 --[[
 	Author: Robert Sirois [http://universesgames.com]
 	License: MIT
-	Released on 5/16/18
+	Last update 5/22/18
 	Website: http://www.etlegacy.com
 	Mod: compatible with Legacy, but might also work with other mods
 	Description: this script posts end-game stats to an http(s) route
 ]]--
 
+--[[
 local version = _VERSION:match("%d+%.%d+")
 package.path = 'lualibs/share/lua/' .. version .. '/?.lua;lualibs/share/lua/' .. version .. '/?/init.lua;' .. package.path
 package.cpath = 'lualibs/lib/lua/' .. version .. '/?.so;' .. package.cpath
+]]--
 
-http = require 'socket.http'
+--http = require 'socket.http'
 --requests = require 'requests'
 json = require 'json'
 io = require 'io'
+os = require 'os'
 
 local modname = 'stats'
 local version = '0.1'
+local game = {
+    ['mapname'] = nil
+    ; ['starttime'] = nil
+    ; ['endtime'] = nil
+    ; ['players'] = nil
+}
 local players = {}
-local defaultStats = {}
-defaultStats['name'] = nil
-defaultStats['team'] = nil
-defaultStats['playerType'] = nil
-defaultStats['skillPointsBattleSense'] = nil
-defaultStats['skillPointsEngineering'] = nil
-defaultStats['skillPointsMedic'] = nil
-defaultStats['skillPointsFieldOps'] = nil
-defaultStats['skillPointsLightWeapons'] = nil
-defaultStats['skillPointsHeavyWeapons'] = nil
-defaultStats['skillPointsCovertOps'] = nil
-defaultStats['skill'] = nil
-defaultStats['rank'] = nil
-defaultStats['medals'] = nil
-defaultStats['kills'] = nil
-defaultStats['deaths'] = nil
-defaultStats['gibs'] = nil
-defaultStats['suicides'] = nil
-defaultStats['teamKills'] = nil
-defaultStats['teamGibs'] = nil
-defaultStats['damageDealt'] = nil
-defaultStats['damageTaken'] = nil
-defaultStats['teamDamageDealt'] = nil
-defaultStats['teamDamageTaken'] = nil
-defaultStats['weaponStats'] = nil
+local defaultStats = {
+    ['name'] = nil
+    ; ['team'] = nil
+    ; ['playerType'] = nil
+    ; ['skillPointsBattleSense'] = nil
+    ; ['skillPointsEngineering'] = nil
+    ; ['skillPointsMedic'] = nil
+    ; ['skillPointsFieldOps'] = nil
+    ; ['skillPointsLightWeapons'] = nil
+    ; ['skillPointsHeavyWeapons'] = nil
+    ; ['skillPointsCovertOps'] = nil
+    ; ['skill'] = nil
+    ; ['rank'] = nil
+    ; ['medals'] = nil
+    ; ['kills'] = nil
+    ; ['deaths'] = nil
+    ; ['gibs'] = nil
+    ; ['suicides'] = nil
+    ; ['teamKills'] = nil
+    ; ['teamGibs'] = nil
+    ; ['damageDealt'] = nil
+    ; ['damageTaken'] = nil
+    ; ['teamDamageDealt'] = nil
+    ; ['teamDamageTaken'] = nil
+    ; ['weaponStats'] = nil
+}
 
 -- skill identifiers
 local BATTLESENSE 	= 0
@@ -69,10 +79,6 @@ function shallowCopy( orig )
     return copy
 end
 
-function et_InitGame()
-    et.RegisterModname( modname .. ' ' .. version )
-end
-
 function getTeam( cNum )
     return et.gentity_get( cNum, 'sess.sessionTeam' )
 end
@@ -89,31 +95,37 @@ function setPlayerStats( cNum )
     local stats = players[getGuid( cNum )]
 
     if stats then
-        stats['name'] = getName( cNum )
-        stats['team'] = getTeam( cNum )
-        stats['playerType'] = et.gentity_get( cNum, 'sess.playerType' )
-        stats['skillPointsBattleSense'] = et.gentity_get( cNum, 'sess.skillpoints', BATTLESENSE )
-        stats['skillPointsEngineering'] = et.gentity_get( cNum, 'sess.skillpoints', ENGINEERING )
-        stats['skillPointsMedic'] = et.gentity_get( cNum, 'sess.skillpoints', MEDIC )
-        stats['skillPointsFieldOps'] = et.gentity_get( cNum, 'sess.skillpoints', FIELDOPS )
-        stats['skillPointsLightWeapons'] = et.gentity_get( cNum, 'sess.skillpoints', LIGHTWEAPONS )
-        stats['skillPointsHeavyWeapons'] = et.gentity_get( cNum, 'sess.skillpoints', HEAVYWEAPONS )
-        stats['skillPointsCovertOps'] = et.gentity_get( cNum, 'sess.skillpoints', COVERTOPS )
-        stats['skill'] = et.gentity_get( cNum, 'sess.skill' )
-        stats['rank'] = et.gentity_get( cNum, 'sess.rank' )
-        stats['medals'] = et.gentity_get( cNum, 'sess.medals' )
-        stats['kills'] = et.gentity_get( cNum, 'sess.kills' )
-        stats['deaths'] = et.gentity_get( cNum, 'sess.deaths' )
-        stats['gibs'] = et.gentity_get( cNum, 'sess.gibs' )
-        stats['suicides'] = et.gentity_get( cNum, 'sess.self_kills' )
-        stats['teamKills'] = et.gentity_get( cNum, 'sess.team_kills' )
-        stats['teamGibs'] = et.gentity_get( cNum, 'sess.team_gibs' )
-        stats['damageDealt'] = et.gentity_get( cNum, 'sess.damage_given' )
-        stats['damageTaken'] = et.gentity_get( cNum, 'sess.damage_received' )
-        stats['teamDamageDealt'] = et.gentity_get( cNum, 'sess.team_damage_given' )
-        stats['teamDamageTaken'] = et.gentity_get( cNum, 'sess.team_damage_received' )
-        stats['weaponStats'] = et.gentity_get( cNum, 'sess.aWeaponStats' )
+        stats['name']                       = getName( cNum )
+        stats['team']                       = getTeam( cNum )
+        stats['playerType']                 = et.gentity_get( cNum, 'sess.playerType' )
+        stats['skillPointsBattleSense']     = et.gentity_get( cNum, 'sess.skillpoints', BATTLESENSE )
+        stats['skillPointsEngineering']     = et.gentity_get( cNum, 'sess.skillpoints', ENGINEERING )
+        stats['skillPointsMedic']           = et.gentity_get( cNum, 'sess.skillpoints', MEDIC )
+        stats['skillPointsFieldOps']        = et.gentity_get( cNum, 'sess.skillpoints', FIELDOPS )
+        stats['skillPointsLightWeapons']    = et.gentity_get( cNum, 'sess.skillpoints', LIGHTWEAPONS )
+        stats['skillPointsHeavyWeapons']    = et.gentity_get( cNum, 'sess.skillpoints', HEAVYWEAPONS )
+        stats['skillPointsCovertOps']       = et.gentity_get( cNum, 'sess.skillpoints', COVERTOPS )
+        stats['skill']                      = et.gentity_get( cNum, 'sess.skill' )
+        stats['rank']                       = et.gentity_get( cNum, 'sess.rank' )
+        stats['medals']                     = et.gentity_get( cNum, 'sess.medals' )
+        stats['kills']                      = et.gentity_get( cNum, 'sess.kills' )
+        stats['deaths']                     = et.gentity_get( cNum, 'sess.deaths' )
+        stats['gibs']                       = et.gentity_get( cNum, 'sess.gibs' )
+        stats['suicides']                   = et.gentity_get( cNum, 'sess.self_kills' )
+        stats['teamKills']                  = et.gentity_get( cNum, 'sess.team_kills' )
+        stats['teamGibs']                   = et.gentity_get( cNum, 'sess.team_gibs' )
+        stats['damageDealt']                = et.gentity_get( cNum, 'sess.damage_given' )
+        stats['damageTaken']                = et.gentity_get( cNum, 'sess.damage_received' )
+        stats['teamDamageDealt']            = et.gentity_get( cNum, 'sess.team_damage_given' )
+        stats['teamDamageTaken']            = et.gentity_get( cNum, 'sess.team_damage_received' )
+        stats['weaponStats']                = et.gentity_get( cNum, 'sess.aWeaponStats' )
     end
+end
+
+function et_InitGame()
+    et.RegisterModname( modname .. ' ' .. version )
+    game['starttime'] = os.date( '!%Y-%m-%dT%TZ' )
+    game['mapname'] = et.trap_Cvar_Get( 'mapname' )
 end
 
 -- set empty stats for players joining if they haven't been already
@@ -130,6 +142,8 @@ function et_ClientBegin( cNum )
 end
 
 function et_ShutdownGame( isRestarting )
+    game['endtime'] = os.date( '!%Y-%m-%dT%TZ' )
+
 	local cNum = 0
 	local maxclients = tonumber( et.trap_Cvar_Get( 'sv_maxclients' ) )
 
@@ -144,18 +158,23 @@ function et_ShutdownGame( isRestarting )
 		cNum = cNum + 1
 	end
 
+    game['players'] = players
+
     -- POST the data
     print '------------------------------------ LUA STATS GAME FINISHED'
-    print( json.encode( players ) )
+    print( json.encode( game ) )
 
-    local file = io.open( 'output.json', 'w' )
+    local file = io.open( './matches/' .. game['starttime'] .. '_' .. game['mapname'] .. '.json', 'w' )
     io.output( file )
-    io.write( json.encode( players ) )
+    io.write( json.encode( game ) )
     io.close( file )
+
+    -- TODO make one of these work... need to have a 32 bit version of luasocket for either to function within the ET:L environment
 
     --response = requests.post{ url='http://localhost:1337/etstats/webhook', data=json.encode( players ) }
 
     -- thanks https://gist.github.com/lidashuang/6286723
+    --[[
     local reqBody = json.encode( players )
     local resBody = {}
 
@@ -169,5 +188,6 @@ function et_ShutdownGame( isRestarting )
         , source = ltn12.source.string( reqBody )
         , sink = ltn12.sink.table( resBody )
     }
+    ]]--
 
 end
