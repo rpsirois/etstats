@@ -1,0 +1,24 @@
+{
+  "name": "etstats",
+  "version": "0.0.1",
+  "description": "Gather stats from ET:L matches and display them.",
+  "author": "Robert Sirois and Universes Games",
+  "homepage": "http://universesgames.com",
+  "private": true,
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "body-parser": "*",
+    "express": "*",
+    "express-session": "*",
+    "moment": "*",
+    "mongodb": "*",
+    "package.json": "^2.0.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-jsy": "^0.8.1"
+  },
+  "scripts": {
+    "start": "babel-node server.jsy --presets babel-preset-jsy"
+  }
+}

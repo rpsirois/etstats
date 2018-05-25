@@ -1,6 +1,8 @@
 ## etstats
 ### an Enemy Territory: Legacy Script
 
+POST stats to a web server which also serves a webpage which is a viewer and search engine for stats. Organized into LAN parties, which contain matches and player data. See example screenshot below.
+
 Requires a JSON module, ie. [https://github.com/rxi/json.lua]()
 
 **TODO**: POST data instead of outputting a file.
@@ -41,3 +43,6 @@ Creates output JSON file `matches/starttime_mapname.json` at end of match, eg.:
 	}
 }
 ```
+
+Example screenshot from viewer:
+![](example.png)

@@ -1,0 +1,47 @@
+{
+  "name": "react-redux-wp",
+  "version": "1.0.0",
+  "description": "react redux dev env starter package",
+  "main": "index.js",
+  "scripts": {
+    "test": "true",
+    "watch": "webpack-dev-server --watch",
+    "build": "webpack",
+    "help": "webpack --help"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RB-bro/react-redux-wp.git"
+  },
+  "author": "brandon brown",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RB-bro/react-redux-wp#issues"
+  },
+  "homepage": "https://github.com/RB-bro/react-redux-wp#readme",
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-jsy": "^0.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.1",
+    "html-webpack-plugin": "^2.28.0",
+    "style-loader": "^0.17.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "webpack": "^2.5.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "bson-objectid": "^1.2.1",
+    "moment": "^2.19.2",
+    "package.json": "^2.0.1",
+    "react": "^15.6.2",
+    "react-dom": "^15.6.2",
+    "react-redux": "^5.0.4",
+    "react-treeview": "^0.4.7",
+    "redux": "^3.6.0",
+    "semantic-ui-css": "*",
+    "semantic-ui-react": "^0.75.1"
+  }
+}

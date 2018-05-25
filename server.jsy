@@ -1,0 +1,52 @@
+const express = require @ 'express'
+const bodyParser = require @ 'body-parser'
+
+const app = express()
+
+app.use @ bodyParser.urlencoded @ ::
+    extended: true
+
+app.use @ express.static @ 'public'
+
+app.post @ '/webhook', ( req, res ) => ::
+    console.log @ req.body
+
+app.get @ '/viewer', ( req, res ) => ::
+    res.sendFile @ './public/index.html', { root: __dirname }
+
+const data = ::
+    mapname: "radar",
+    endtime: "2018-05-25T02:47:58.176Z",
+    starttime: "2018-05-25T02:23:43.438Z",
+    stats: ::
+        team: 2,
+        teamKills: 0,
+        skillPointsLightWeapons: 0,
+        rank: 0,
+        kills: 0,
+        skillPointsFieldOps: 0,
+        teamGibs: 0,
+        playerType: 0,
+        deaths: 0,
+        medals: 0,
+        teamDamageDealt: 0,
+        weaponStats: [ 0, 0, 0, 0, 0 ],
+        skillPointsCovertOps: 0,
+        teamDamageTaken: 0,
+        gibs: 0,
+        damageTaken: 0,
+        damageDealt: 0,
+        suicides: 0,
+        skillPointsEngineering: 0,
+        skill: 0,
+        skillPointsMedic: 0,
+        skillPointsHeavyWeapons: 0,
+        skillPointsBattleSense: 0
+
+app.get @ '/data', ( req, res ) => ::
+    res.json @ data
+
+app.get @ '/data-lagged', ( req, res ) => ::
+    setTimeout @ () => res.json( data ), 3000
+
+app.listen( 1337, () => console.log( 'Enemy Territory Stats Processor listening on port 1337 locally.' ) )
